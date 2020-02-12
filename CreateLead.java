@@ -1,31 +1,59 @@
-package week2Day2;
+package leafTaps;
 
-import org.junit.Test;
-import org.openqa.selenium.WebElement;
+import java.io.IOException;
 
-import wdMethods.SeMethods;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
-public class CreateLead extends SeMethods{
-	
-	@Test
-	public void createLead() {
-		startApp("Chrome", "http://leaftaps.com/opentaps/control/login");
-		WebElement userName = locateElement("username");
-		type(userName, "DemoSalesManager");
+import utils.ReadExcel;
+import wdMethods.ProjectMethods;
+
+public class CreateLead extends ProjectMethods{
+
+	@Test (dataProvider = "FetchData")
+	public void createLead(String companyName, String firstName, String lastName) {
 		
-		WebElement password = locateElement("password");
-		type(password, "crmsfa");
-		
-		WebElement login = locateElement("class", "decorativeSubmit");
-		click(login);
-		click(locateElement("link","CRM/SFA"));
+		//creating the lead - clicking create lead link
 		click(locateElement("link","Create Lead"));
-		type(locateElement("createLeadForm_companyName"), "Test");
-		type(locateElement("xpath","//input[@id='createLeadForm_firstName']"), "Sunil");
-		type(locateElement("xpath","//input[@id='createLeadForm_lastName']"), "Kumar");
+		
+		//Entering values in the mandatory fields
+		type(locateElement("createLeadForm_companyName"), companyName);
+		type(locateElement("xpath","//input[@id='createLeadForm_firstName']"), firstName);
+		type(locateElement("xpath","//input[@id='createLeadForm_lastName']"), lastName);
 		selectDropDownUsingIndex(locateElement("createLeadForm_dataSourceId"),2);
+		
+		//Clicking create lead button
 		click(locateElement("xpath","//input[@value='Create Lead']"));
+		
+		//Displaying the newly created lead id
+		int count = locateElement("viewLead_companyName_sp").getText().length();
+		System.out.println(locateElement("viewLead_companyName_sp").getText().substring(count-6, count-1)
+				+ " id is successfully created");
 	}
 	
+	@DataProvider(name ="FetchData")
+	public Object [][] getDataFromExcel() throws IOException
+	{
+		ReadExcel excel = new ReadExcel();
+		Object[][] data = excel.readExcel("data");
+		return data;
+	}
+	
+	@DataProvider(name ="FetchData1")
+	public Object [][] getData()
+	{
+		Object [] [] data = new Object[2][3];
+		
+		data [0][0]="Test Leaf";
+		data [0][1]="Mr";
+		data [0][2]="X";
+		
+		data [1][0]="Test Leaf";
+		data [1][1]="Mr";
+		data [1][2]="Y";
+		
+		return data;
+	}
+
 
 }

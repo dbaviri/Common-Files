@@ -1,74 +1,63 @@
-package week2Day1;
+package leafTaps;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import org.junit.Test;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import wdMethods.SeMethods;
 
-public class MergeLeads {
+public class MergeLeads extends SeMethods{
 
-	public static void main(String[] args) throws InterruptedException {
+	@Test
+	public void mergeLeads() {
+		//launching the browser and entering the url
+		startApp("Chrome", "http://leaftaps.com/opentaps/control/login");
 		
-		//
-		System.setProperty("webdriver.chrome.driver", "./Drivers/chromedriver.exe");
-		ChromeDriver driver = new ChromeDriver();
-		driver.manage().window().maximize();
-		driver.get("http://leaftaps.com/opentaps/control/main");
+		//logging into leaftaps
+		type(locateElement("username"), "DemoSalesManager");
+		type(locateElement("password"), "crmsfa");
+		click(locateElement("class", "decorativeSubmit"));
 		
-		//implicit wait
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		//entering into crm/sfa page
+		click(locateElement("link","CRM/SFA"));
 		
-		driver.findElementById("username").sendKeys("DemoSalesManager");
-		driver.findElementById("password").sendKeys("crmsfa");
-		driver.findElementByClassName("decorativeSubmit").click();
-		driver.findElementByLinkText("CRM/SFA").click();
-		driver.findElementByLinkText("Leads").click();
-		driver.findElementByLinkText("Merge Leads").click();
-		driver.findElementByXPath("(//img[@src='/images/fieldlookup.gif'])[1]").click();
-		Set<String> windowHandles = driver.getWindowHandles();
-		List<String> arrayList = new ArrayList<String>();
-		arrayList.addAll(windowHandles);
-		driver.switchTo().window(arrayList.get(1));
-		driver.findElementByXPath("(//div[@class='x-form-element'])[1]/input").sendKeys("10663");
-		driver.findElementByXPath("//button[text()='Find Leads']").click();
-		Thread.sleep(3000);
-		WebDriverWait wait = new WebDriverWait(driver,10);
-		wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//div[@class='x-grid3-cell-inner x-grid3-col-firstName'])[1]/a")));
-		driver.findElementByXPath("(//div[@class='x-grid3-cell-inner x-grid3-col-firstName'])[1]/a").click();
+		//merging the leads
+		click(locateElement("xpath","//a[text()='Leads']"));
+		click(locateElement("link","Merge Leads"));
 		
-		windowHandles = driver.getWindowHandles();
-		arrayList = new ArrayList<String>();
-		arrayList.addAll(windowHandles);
-		driver.switchTo().window(arrayList.get(0));
+		//finding the first lead using id
+		click(locateElement("xpath","(//img[@src='/images/fieldlookup.gif'])[1]"));
+		switchToWindow(1);
+		type(locateElement("xpath","(//div[@class='x-form-element'])[1]/input"),"11969");
+		click(locateElement("xpath","//button[text()='Find Leads']"));
+		waitExplicitly("xpath","(//div[@class='x-grid3-cell-inner x-grid3-col-firstName'])[1]/a");
+		clickWithoutSnap(locateElement("xpath","(//div[@class='x-grid3-cell-inner x-grid3-col-firstName'])[1]/a"));
+		switchToWindow(0);
 		
-		//driver.switchTo().window(arrayList.get(0));
-		driver.findElementByXPath("(//img[@src='/images/fieldlookup.gif'])[2]").click();
-		windowHandles = driver.getWindowHandles();
-		arrayList = new ArrayList<String>();
-		arrayList.addAll(windowHandles);
-		driver.switchTo().window(arrayList.get(1));
-		driver.findElementByXPath("(//div[@class='x-form-element'])[1]/input").sendKeys("10673");
-		driver.findElementByXPath("//button[text()='Find Leads']").click();
-		Thread.sleep(3000);
-		wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='x-grid3-cell-inner x-grid3-col-firstName']/a[1]")));
-		driver.findElementByXPath("//div[@class='x-grid3-cell-inner x-grid3-col-firstName']/a[1]").click();
-		driver.switchTo().window(arrayList.get(0));
-		driver.findElementByLinkText("Merge").click();
-		//driver.switchTo().alert().accept();
-		driver.findElementByLinkText("Find Leads").click();
-		driver.findElementByXPath("(//div[@class='x-form-item x-tab-item'])[1]//input").sendKeys("10278");
-		driver.findElementByXPath("//button[text()='Find Leads']").click();
-		if(driver.findElementByXPath("//div[text()='No records to display']").isDisplayed())
+		//Finding the second lead using id
+		click(locateElement("xpath","(//img[@src='/images/fieldlookup.gif'])[2]"));
+		switchToWindow(1);
+		type(locateElement("xpath","(//div[@class='x-form-element'])[1]/input"),"11245");
+		click(locateElement("xpath","//button[text()='Find Leads']"));
+		waitExplicitly("xpath","(//div[@class='x-grid3-cell-inner x-grid3-col-firstName'])[1]/a");
+		clickWithoutSnap(locateElement("xpath","(//div[@class='x-grid3-cell-inner x-grid3-col-firstName'])[1]/a"));
+		switchToWindow(0);
+		
+		//Merging two leads
+		clickWithoutSnap(locateElement("link","Merge"));
+		acceptAlert();
+		click(locateElement("link","Find Leads"));
+		type(locateElement("xpath","(//div[@class='x-form-item x-tab-item'])[1]//input"),"11969");
+		click(locateElement("xpath","//button[text()='Find Leads']"));
+		
+		//verifying whether leads have been merged or not
+		if(locateElement("xpath","//div[text()='No records to display']").isDisplayed())
 		{
-			System.out.println("No record to display error message got displayed");
+			System.out.println("Merged Successfully");
 		}
-		driver.close();
-		
+		else
+		{
+			System.out.println("Lead ids are not merged");
+		}
+		closeBrowser();
 	}
 
 }
